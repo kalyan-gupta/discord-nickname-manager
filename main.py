@@ -13,7 +13,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # FIXED Firebase Initialization
+firebase_project_id = None
+
 def initialize_firebase():
+    global firebase_project_id
     try:
         # Get Firebase config from environment variable
         firebase_config_json = os.environ.get('FIREBASE_CONFIG')
@@ -28,11 +31,17 @@ def initialize_firebase():
         # Parse the JSON string
         service_account_info = json.loads(firebase_config_json)
         
+        # Extract project_id from service account
+        firebase_project_id = service_account_info.get('project_id')
+        if not firebase_project_id:
+            logger.error("❌ project_id not found in FIREBASE_CONFIG")
+            return False
+        
         # Initialize Firebase with the service account
         cred = credentials.Certificate(service_account_info)
         firebase_admin.initialize_app(cred)
         
-        logger.info("✅ Firebase initialized successfully with service account")
+        logger.info(f"✅ Firebase initialized successfully with project: {firebase_project_id}")
         return True
         
     except json.JSONDecodeError as e:
@@ -52,10 +61,11 @@ if not firebase_admin._apps:
 
 # Firestore client (will be None if Firebase failed)
 try:
-    db = firestore.AsyncClient() if firebase_admin._apps else None
-    if db:
+    if firebase_admin._apps and firebase_project_id:
+        db = firestore.AsyncClient(project=firebase_project_id)
         logger.info("✅ Firestore client ready")
     else:
+        db = None
         logger.warning("⚠️ Firestore client not available")
 except Exception as e:
     logger.error(f"❌ Failed to create Firestore client: {e}")

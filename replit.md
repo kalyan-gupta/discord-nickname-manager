@@ -38,7 +38,15 @@ Firebase Firestore collections:
   - `added_at`: Timestamp when role was added
 
 ## Recent Changes
-- 2024-11-01: Initial project setup with Python 3.11 and dependencies installed
+- 2025-11-01: Initial project setup with Python 3.11 and dependencies installed
+- 2025-11-01: Fixed Firebase Firestore client initialization to properly use project_id
+- 2025-11-01: Bot successfully connected to Discord and Firebase - fully operational
+
+## Current Status
+- Bot is running and connected to Discord
+- Firebase/Firestore integration is working
+- Connected to 1 Discord server
+- All features operational
 
 ## User Preferences
 None configured yet.
