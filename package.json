@@ -1,0 +1,16 @@
+{
+  "name": "discord-nickname-guardian",
+  "version": "1.0.0",
+  "description": "Discord bot for nickname management with Firebase",
+  "main": "bot.py",
+  "scripts": {
+    "start": "python bot.py"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": ["discord", "bot", "nickname", "firebase"],
+  "author": "Your Name",
+  "license": "MIT"
+}
