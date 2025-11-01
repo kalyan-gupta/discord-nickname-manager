@@ -126,7 +126,7 @@ class NicknameGuardian:
                 'username': str(user)
             }
             
-            user_ref.set(user_data) #, merge=True)
+            user_ref.set(user_data)
             logger.debug(f"✅ Initialized user: {user.display_name}")
         except Exception as e:
             logger.error(f"❌ Error initializing user: {e}")
@@ -259,9 +259,6 @@ class NicknameGuardian:
             return
         guild = after.guild
         
-        # Initialize user if not in database
-        # await self.initialize_user(after, guild)
-        
         try:
             # Get audit log to see who made the change
             async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.member_update):
@@ -273,6 +270,7 @@ class NicknameGuardian:
         except discord.Forbidden:
             # Fallback if bot can't read audit logs
             actor = after
+        
         # Check if it's a self-change (user changing their own nickname)
         is_self_change = actor.id == after.id
         
@@ -596,22 +594,26 @@ async def bot_status(ctx):
     
     await ctx.send(embed=embed)
 
-# Keep-alive server
-app = Flask('')
+# Flask server for Render health checks
+app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "🛡️ Nickname Guardian Bot"
+    return "🛡️ Nickname Guardian Bot - Online"
 
-def keep_alive():
-    Thread(target=lambda: app.run(host='0.0.0.0', port=8080), daemon=True).start()
+def run_flask():
+    app.run(host='0.0.0.0', port=8080, debug=False)
 
-# Start bot
 if __name__ == "__main__":
-    keep_alive()
+    # Start Flask server in a separate thread for Render health checks
+    from threading import Thread
+    flask_thread = Thread(target=run_flask, daemon=True)
+    flask_thread.start()
+    
+    # Start Discord bot
     token = os.environ.get('DISCORD_TOKEN')
     if token:
-        logger.info("🚀 Starting bot...")
+        logger.info("🚀 Starting bot on Render...")
         bot.run(token)
     else:
         logger.error("❌ DISCORD_TOKEN not found")
